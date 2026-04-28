@@ -1,0 +1,84 @@
+include <stdio.h>
+include <stdlib.h>
+
+void readFile(const char *filename, double **xArr, double **yArr, int *n){
+	FILE *file = fopen(filename, "r");
+	if (file == NULL){
+		printf("Error: Could not open file '%s'\n", filename);
+		exit(1);
+	}
+	int capacity = 10;
+	*n = 0;
+	*xArr = (double *)malloc(capacity * sizeof(double));
+	*yArr = (double *)malloc(capacity * sizeof(double));
+	if(xArr == NULL || yArr == NULL){
+		printf("Error: Memory Allocation Failed\n");
+		exit(1);
+	}
+	double x, y;
+
+	while (fscanf(file, "%lf,%lf", &x, &y) =
+        // Check if we've run out of capacity
+        // If n has reached capacity, we need more space
+        if (*n == capacity) {
+
+            // Double the capacity
+            capacity *= 2;
+
+            // realloc resizes existing memory
+            // Takes original pointer and new size
+            // Returns new pointer (may be different address)
+            // IMPORTANT: use temp pointer first, never realloc directly
+            // because if it fails and returns NULL, you'd lose original data
+            double *tempX = (double *)realloc(*xArr, capacity * sizeof(double));
+            double *tempY = (double *)realloc(*yArr, capacity * sizeof(double));
+
+            // Check if realloc succeeded
+            if (tempX == NULL || tempY == NULL) {
+                printf("Error: Memory reallocation failed\n");
+                fclose(file);
+                free(*xArr);
+                free(*yArr);
+                exit(1);
+            }
+
+            	*xArr = tempX;
+            	*yArr = tempY;
+        	}
+
+        	(*xArr)[*n] = x;
+        	(*yArr)[*n] = y;
+
+		(*n)++;
+	}
+
+
+	fclose(file);
+};
+
+void calculateSums(double *xArr, double *yArr, int n, double *sumX, double *sumY, double *sumXY, double *sumX2);
+void computeAB(double sumX, double sumY, double sumXY, double sumX2, double *a, double *b);
+void printEquation(double a, double b);
+double predictY(double a, double b);
+void freeMemory(double *xArr, double *yArr);
+
+int main(){
+	char filename[100];
+	double xArr = NULL;
+	double yArr = NULL;
+	int n = 0;
+	double sunX, sumY, sumXY, sumX2;
+
+	printf("Enter filename: ");
+	scanf("%s",filename);
+
+	readFile(filename, &xArr, &yArr, &n);
+	calculateSums(xArr, yArr, n, &sumX, &sumY, &sumXY, &sumX2);
+	computeAB(sumX, sumY, sumXY, sumX2, &a, &b);
+	printEquation(a, b);
+	predictY(a, b);
+	freeMemory(xArr, yArr);
+
+	return 0;
+}
+
